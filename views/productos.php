@@ -376,9 +376,8 @@ include '../layout/layout.php';
         let id = boton.getAttribute('data-id')
         let descripcion = boton.getAttribute('data-descripcion')
         let descuento = boton.getAttribute('data-descuento')
-        console.log(typeof(descuento))
         document.querySelector('textarea').value = descripcion
-        document.querySelector('#descuento').value = descuento
+        document.querySelector('#descuento').value = parseInt(descuento) === 0 ?'Seleccione el descuento' : descuento
         document.querySelector('#formDoc').setAttribute('data-producto-id', id)
     })
     modalImagen.addEventListener('show.bs.modal', function(event){

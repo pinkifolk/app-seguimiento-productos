@@ -9,7 +9,7 @@ function conn (){
 
 
 function index($search_query){
-    $query = "SELECT P.id, IFNULL(P.cod_unificado,'No codificado')cod_unificado, P.especificaciones, M.descripcion marca, C.descripcion categoria, IFNULL(S.stock,0) stock, P.consignado, APM.imagen, APM.ficha
+    $query = "SELECT P.id, IFNULL(P.cod_unificado,'No codificado')cod_unificado, P.especificaciones, M.descripcion marca, C.descripcion categoria, IFNULL(S.stock,0) stock, P.consignado, APM.imagen, APM.ficha, P.descuento
             FROM productos P 
             LEFT JOIN marcas M ON M.id=P.marca_id 
             LEFT JOIN categorias C ON C.id=P.categoria_id 
