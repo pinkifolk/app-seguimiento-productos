@@ -108,5 +108,25 @@ function confirm ($id){
     $stmt->execute();
     $success = $stmt->affected_rows > 0 ? true : false;
     $stmt->close();
+    
+    $query ="SELECT producto_id FROM app_traslados_det WHERE traslado_id=?";
+    $stmt = conn()->prepare($query);
+    $stmt->bind_param("s", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+    
+    $product = [];
+    while ($row = $result->fetch_assoc()) {
+        $product[] = $row["producto_id"];
+    }
+    
+    if(!empty($product)){
+        $product_ids = array_map('intval', $product);
+        $in = implode(',', $product_ids);
+        
+        $update = "UPDATE productos SET outlet=1, consignado=1 WHERE id IN ($in)";
+        conn()->query($update);
+    }
     return $success;
 }
