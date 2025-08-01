@@ -2,7 +2,7 @@
 
 Este proyecto es una aplicación desarrollada en PHP para gestionar y dar seguimiento a tareas, proyectos o actividades. Permite organizar información, registrar avances y facilitar la colaboración entre usuarios. Su objetivo principal es mejorar la productividad y el control de procesos dentro de una organización.
 
-Esta proyecto es complementario a un sistema por lo que debe tener como base una tabla de productos.
+Este proyecto es complementario a un sistema por lo que debe tener como base una tabla de productos.
 
 ## Características principales
 
@@ -21,5 +21,5 @@ Esta proyecto es complementario a un sistema por lo que debe tener como base una
 
 1. Clona el repositorio en tu servidor local.
 2. Configura la conexión a la base de datos en el archivo de configuración.
-3. Ejecuta revisa el directorio databases y ejecuta el archivo tablas.sql para crear las tablas.
+3. Revisa el directorio databases y ejecuta el archivo tablas.sql para crear las tablas.
 4. Accede a la aplicación desde tu navegador.
