@@ -37,6 +37,7 @@ CREATE TABLE app_servicios_prod_det (
     limpieza BOOLEAN DEFAULT 0,
     pintura BOOLEAN DEFAULT 0,
     banco_pruebas BOOLEAN DEFAULT 0,
+	ninguno BOOLEAN DEFAULT 0,
     estado BOOLEAN DEFAULT 0,
     FOREIGN KEY (envio_id) REFERENCES app_envio(id)
 )ENGINE=MyISAM CHARSET=utf8 COLLATE=utf8_spanish_ci;
