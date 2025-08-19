@@ -69,6 +69,12 @@ include '../layout/layout.php';
         }
         
 </style>
+
+<!--
+hablitar la opcion para que un producto no tenga un servicio y este listo para venderse
+habilitar fecha de recepcion y id del usuario de la recepcion
+-->
+
 <div class="container py-4">
     <h1 class="mb-2">Recepción de productos</h1>
     <form class="d-flex py-4" role="search" onsubmit="return false;">
@@ -116,6 +122,7 @@ include '../layout/layout.php';
                                 <th>Pintura</th>
                                 <th>Banco Pruebas</th>
                                 <th>Todos</th>
+                                <th>Ninguno</th>
                             </tr>
                         </thead>
                         <tbody id="selectedProductsTableBody" class="align-middle">
@@ -280,6 +287,9 @@ include '../layout/layout.php';
                         <td>
                            <input type='checkbox' class='form-check-input ms-1 service-todos' data-product-id='${item.id}'>
                         </td>
+                        <td>
+                           <input type='checkbox' class='form-check-input ms-1 service-ninguno' data-product-id='${item.id}'>
+                        </td>
                     </tr>
                     `
                 })
@@ -338,7 +348,7 @@ include '../layout/layout.php';
                             ${item.banco_pruebas ? '<i class="fa-solid fa-check ms-4" style="color: #27c507;"></i>' : '<i class="fa-solid fa-x ms-4" style="color: #eb0f0f;"></i>'}
                         </td>
                         <td>
-                            <input type='checkbox' class='form-check-input ms-4 proceso' data-product-id='${item.id}' ${item.estado == 1 ? 'checked' : ''}>
+                            <input type='checkbox' class='form-check-input ms-4 proceso' data-product-id='${item.id}' ${item.estado == 1 ? 'checked' : ''} ${item.estado == 1 ? 'disabled' : ''}>
                         </td>
                     </tr>
                     `
@@ -553,6 +563,25 @@ include '../layout/layout.php';
         searchModal.value = ''
         searchProcessModal.value =''
     })
+    document.addEventListener("change", function(e) {
+  
+  if (e.target.matches(".service-pintura, .service-reparacion, .service-certificacion, .service-todos")) {
+    const row = e.target.closest("tr"); // la fila actual
+    const ninguno = row.querySelector(".service-ninguno");
+    if (e.target.checked) {
+      ninguno.checked = false; // desactiva "ninguno"
+    }
+  }
+
+  if (e.target.matches(".service-ninguno")) {
+    const row = e.target.closest("tr");
+    if (e.target.checked) {
+      // desactiva todos los demás si se marca "ninguno"
+      row.querySelectorAll(".service-pintura, .service-reparacion, .service-certificacion, .service-todos")
+        .forEach(cb => cb.checked = false);
+    }
+  }
+});
 
     
     

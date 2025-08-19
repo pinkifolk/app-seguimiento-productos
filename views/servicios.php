@@ -101,6 +101,7 @@ include '../layout/layout.php';
                     <th>N°</th>
                     <th>Titulo</th>
                     <th>Fecha Envio</th>
+                    <th>Fecha Recepción</th>
                     <th>Fecha Termino</th>
                     <th>Unidades</th>
                     <th>Estado</th>
@@ -254,6 +255,7 @@ include '../layout/layout.php';
                         <td>${index +1}</td>
                         <td>${product.titulo}</td>
                         <td>${product.formato_fecha}</td>
+                        <td>${product.formato_recepcion ? product.formato_recepcion : ''}</td>
                         <td>${product.formato_termino ? product.formato_termino : ''}</td>
                         <td>${product.unidades}</td>
                         <td>

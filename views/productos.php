@@ -60,6 +60,15 @@ include '../layout/layout.php';
             justify-content: center;
             align-items: center;
         }
+        .documents{
+            background: white;
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         .switch {
           position: relative;
           display: inline-block;
@@ -153,7 +162,9 @@ include '../layout/layout.php';
     </div>
   </div>
 </div>
-<!-- Modal Documentacion -->
+<!-- Modal Documentacion 
+dividir la descripcion de la ficha y del descuento 
+-->
 <div class="modal fade" id="modalDoc" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -164,16 +175,21 @@ include '../layout/layout.php';
         </div>
         <div class="modal-body">
             <div class="mb-3">
-              <label for="descripcion" class="form-label">Descripción</label><span class="text-danger">*</span>
-              <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
-            </div>
-            <div class="mb-3">
               <label for="descuento" class="form-label">Descuento</label><span class="text-danger">*</span>
                   <select class="form-select" id="descuento" name="descuento" aria-label="Descuento">
                     <option values="0" selected>Seleccione el descuento</option>
-                    <option value="10">10%</option>
-                    <option value="50">50%</option>
-                    <option value="70">70%</option>
+                      <option value="15">15%</option>
+                      <option value="20">20%</option>
+                      <option value="25">25%</option>
+                      <option value="30">30%</option>
+                      <option value="35">35%</option>
+                      <option value="40">40%</option>
+                      <option value="45">45%</option>
+                      <option value="50">50%</option>
+                      <option value="55">55%</option>
+                      <option value="60">60%</option>
+                      <option value="65">65%</option>
+                      <option value="70">70%</option>
                   </select>
             </div>
             <div class="mb-3">
@@ -192,15 +208,40 @@ include '../layout/layout.php';
     </div>
   </div>
 </div>
+<!-- Modal descripcion -->
+<div class="modal fade" id="modalDescription" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form enctype="multipart/form-data">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">Detalles</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label><span class="text-danger">*</span>
+              <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" data-bs-dismiss="modal" aria-label="Cerrar" class="btn btn-danger">Cancelar</button>
+          <button type="button" id="formDescripcion" class="btn btn-success">Confirmar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
     const modalDetalles = document.getElementById('modalDoc')
     const modalImagen = document.getElementById('modalImagen')
+    const modalDescripcion = document.getElementById('modalDescription')
     const searchInput = document.getElementById('search_input')
     const productsTableBody = document.getElementById('products_table_body')
     const formImagen = document.getElementById('formImagen')
     const formDoc = document.getElementById('formDoc')
+    const formDescripcion = document.getElementById('formDescripcion')
     
     
     
@@ -241,9 +282,30 @@ include '../layout/layout.php';
         loadProducts()
         
     }
-    async function productosFicha(productoId,descripcion,descuento,ficha){
+    async function productosFicha(productoId,descuento,ficha){
         try{
-            const response = await fetch(`../controllers/get_products.php?accion=4&id=${productoId}&descripcion=${descripcion}&descuento=${descuento}&ficha=${ficha}`)
+            const response = await fetch(`../controllers/get_products.php?accion=4&id=${productoId}&descuento=${descuento}&ficha=${ficha}`)
+            if(!response.ok){
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+            const {status, mensaje} = await response.json()
+            
+            if(!status){
+                toastr.error(mensaje)
+                return
+            }
+           
+            toastr.success(mensaje)
+            
+        }catch(error){
+          console.error('Error al cargar productos:', error)  
+        }
+        loadProducts()
+        
+    }
+    async function productosDescripcion(productoId,descripcion){
+        try{
+            const response = await fetch(`../controllers/get_products.php?accion=5&id=${productoId}&descripcion=${descripcion}`)
             if(!response.ok){
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
@@ -281,6 +343,8 @@ include '../layout/layout.php';
             products.forEach((product) => {
                 let readyImageHtml =''
                 let readyDocHtml =''
+                let readyDescriptionHtml = ''
+                console.log(product)
                 if(product.imagen === 1){
                     readyImageHtml =`<div class="ready">
                                     <i class="fa-solid fa-circle-check fa-xl" style="color: rgb(25, 135, 84);"></i>
@@ -306,19 +370,38 @@ include '../layout/layout.php';
                                 `
                     
                 }else{
-                    readyDocHtml =`<img src="https://images.icon-icons.com/1369/PNG/512/-description_90717.png" alt="#" class="img-thumbnail rounded-circle">
+                    readyDocHtml =`<div class="documents"><i class="fa-solid fa-list fa-xl"></i></div>
                                 <div class="image-overlay">
                                     <button type="button"
                                             class="change-image-btn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#modalDoc"
                                             data-id="${product.id_registro}"
-                                            data-descripcion="${product.especificaciones}"
                                             data-descuento="${product.descuento ?? "0"}">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
                                 </div>
+                                
                                 `
+                }
+                if(product.descripcion === 1){
+                     readyDescriptionHtml =`<div class="ready">
+                                    <i class="fa-solid fa-circle-check fa-xl" style="color: rgb(25, 135, 84);"></i>
+                                </div>
+                                `
+                }else{
+                    readyDescriptionHtml = `<div class="documents"><i class="fa-regular fa-keyboard fa-xl"></i></div>
+                                <div class="image-overlay">
+                                    <button type="button"
+                                            class="change-image-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalDescription"
+                                            data-id="${product.id_registro}"
+                                            data-descripcion="${product.especificaciones}">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    </button>
+                                </div>
+                            `
                 }
                 const row = `
                     <tr class="align-middle">
@@ -331,6 +414,9 @@ include '../layout/layout.php';
                         <td>
                             <div class="image-container">
                                 ${readyDocHtml}
+                            </div>
+                            <div class="image-container">
+                                ${readyDescriptionHtml}
                             </div>
                         </td>
                         <td>${product.cod_unificado}</td>
@@ -380,6 +466,13 @@ include '../layout/layout.php';
         document.querySelector('#descuento').value = parseInt(descuento) === 0 ?'Seleccione el descuento' : descuento
         document.querySelector('#formDoc').setAttribute('data-producto-id', id)
     })
+    modalDescription.addEventListener('show.bs.modal', function(event){
+        let boton = event.relatedTarget
+        let id = boton.getAttribute('data-id')
+        let descripcion = boton.getAttribute('data-descripcion')
+        document.querySelector('textarea').value = descripcion
+        document.querySelector('#formDescripcion').setAttribute('data-producto-id', id)
+    })
     modalImagen.addEventListener('show.bs.modal', function(event){
         let boton = event.relatedTarget
         let id = boton.getAttribute('data-id')
@@ -395,12 +488,21 @@ include '../layout/layout.php';
     formDoc.addEventListener('click', function(event){
         let boton = event.target
         let id = boton.getAttribute('data-producto-id')
-        let descripcion = document.querySelector('#descripcion')
         let descuento = document.querySelector('#descuento')
         let ficha = document.querySelector('#ficha')
         
-        productosFicha(id,descripcion.value,descuento.value,ficha.checked)
+        productosFicha(id,descuento.value,ficha.checked)
         const bsModal = bootstrap.Modal.getInstance(modalDetalles)
+        bsModal.hide()
+
+    })
+    formDescripcion.addEventListener('click', function(event){
+        let boton = event.target
+        let id = boton.getAttribute('data-producto-id')
+        let descripcion = document.querySelector('textarea')
+        
+        productosDescripcion(id,descripcion.value)
+        const bsModal = bootstrap.Modal.getInstance(modalDescripcion)
         bsModal.hide()
 
     })
