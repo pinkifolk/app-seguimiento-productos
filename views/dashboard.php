@@ -5,6 +5,7 @@ if (!isset($_SESSION['nombre'])) {
     exit();
 }
 $titulo = 'App seguimiento | Dashboard';
+
 ob_start();
 $contenido = ob_get_clean();
 include '../layout/layout.php';
@@ -193,34 +194,52 @@ include '../layout/layout.php';
      
 </div>
  <script>
-    new Chart(document.getElementById('trasladados'), {
-      type: 'pie',
-      data: {
-        labels: ['Quilicura'],
-        datasets: [{
-          data: [ 100],
-          backgroundColor: ['#0d6efd']
-        }]
-      }
-    });
-    new Chart(document.getElementById('listos'), {
-      type: 'pie',
-      data: {
-        labels: ['Limpieza', 'Pintura', 'Fotografia','Banco de prueba'],
-        datasets: [{
-          data: [ 300, 150, 100,200],
-          backgroundColor: ['#0d6efd', '#198754', '#ffc107','#cb1111']
-        }]
-      }
-    });
-    new Chart(document.getElementById('servicios'), {
-      type: 'pie',
-      data: {
-        labels: ['Listos para vender', 'En Preparación'],
-        datasets: [{
-          data: [300, 150],
-          backgroundColor: ['#198754', '#0d6efd']
-        }]
-      }
-    });
+    async function loadInfo() {
+        try {
+            const response = await fetch(`../controllers/get_dashboard.php?accion=2`)
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+            const {traslado,preparacion,listos} = await response.json()
+            
+            new Chart(document.getElementById('trasladados'), {
+              type: 'pie',
+              data: {
+                labels: ['Quilicura','Lircay'],
+                datasets: [{
+                  data: traslado,
+                  backgroundColor: ['#0d6efd','#198754']
+                }]
+              }
+            });
+            new Chart(document.getElementById('listos'), {
+              type: 'pie',
+              data: {
+                labels: ['Limpieza', 'Pintura', 'Fotografia','Banco de prueba'],
+                datasets: [{
+                  data: preparacion,
+                  backgroundColor: ['#0d6efd', '#198754', '#ffc107','#cb1111']
+                }]
+              }
+            });
+            new Chart(document.getElementById('servicios'), {
+              type: 'pie',
+              data: {
+                labels: ['Listos para vender', 'En Preparación'],
+                datasets: [{
+                  data: listos,
+                  backgroundColor: ['#198754', '#0d6efd']
+                }]
+              }
+            });
+            
+            
+        } catch (error) {
+            console.error('Error al cargar la informacion:', error)
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        loadInfo()
+    })
   </script>
