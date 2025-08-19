@@ -24,6 +24,7 @@ CREATE TABLE app_servicios_prod (
 	id INT PRIMARY KEY AUTO_INCREMENT,
     titulo VARCHAR(50),
     fecha_creacion DATE NULL,
+	fecha_recepcion DATE NULL,
     fecha_termino DATE NULL,
     estado TINYINT UNSIGNED NOT NULL DEFAULT 0
 )ENGINE=MyISAM CHARSET=utf8 COLLATE=utf8_spanish_ci;
