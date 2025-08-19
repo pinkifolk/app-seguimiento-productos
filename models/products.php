@@ -9,7 +9,7 @@ function conn (){
 
 
 function index($search_query){
-    $query = "SELECT P.id, IFNULL(P.cod_unificado,'No codificado')cod_unificado, P.especificaciones, M.descripcion marca, C.descripcion categoria, IFNULL(S.stock,0) stock, P.consignado, APM.imagen, APM.ficha, P.descuento
+    $query = "SELECT P.id, IFNULL(P.cod_unificado,'No codificado')cod_unificado, P.especificaciones, M.descripcion marca, C.descripcion categoria, IFNULL(S.stock,0) stock, P.consignado, APM.imagen, APM.ficha, APM.descripcion, P.descuento
             FROM productos P 
             LEFT JOIN marcas M ON M.id=P.marca_id 
             LEFT JOIN categorias C ON C.id=P.categoria_id 
@@ -42,7 +42,7 @@ function index($search_query){
     return $products;
 }
 function multimedia($id){
-    $query = "INSERT INTO app_productos_multimedia (producto_id,imagen,ficha) VALUES (?,1,0) ON DUPLICATE KEY UPDATE imagen= 1";
+    $query = "INSERT INTO app_productos_multimedia (producto_id,imagen,ficha,descripcion) VALUES (?,1,0,0) ON DUPLICATE KEY UPDATE imagen= 1";
     $stmt = conn()->prepare($query);
     $stmt->bind_param("i", $id);
     
@@ -54,16 +54,36 @@ function multimedia($id){
     $stmt->close();
     return $success;
 }
-function documentation($id,$descripcion,$descuento,$ficha){
+function description($id,$descripcion){
+    $query1 = "INSERT INTO app_productos_multimedia (producto_id,imagen,ficha,descripcion) VALUES (?,0,0,1) ON DUPLICATE KEY UPDATE descripcion= 1";
+    $stmt1 = conn()->prepare($query1);
+    $stmt1->bind_param("i", $id);
+    
+    $query2 ="UPDATE productos SET especificaciones=? WHERE id=?";
+    $stmt2 = conn()->prepare($query2);
+    $stmt2->bind_param("ss", $descripcion,$id);
+    
+    $success = false;
+    if ($stmt1->execute() && $stmt2->execute()) {
+        $success = $stmt1->affected_rows > 0 || $stmt2->affected_rows > 0;
+    }
+
+    $stmt1->close();
+    $stmt2->close();
+    return $success;
+    
+    
+}
+function documentation($id,$descuento,$ficha){
     $tiene_ficha = $ficha ==="true" ? 1 : 0;
     
-    $query1 = "INSERT INTO app_productos_multimedia (producto_id,imagen,ficha) VALUES (?,0,?) ON DUPLICATE KEY UPDATE ficha= ?";
+    $query1 = "INSERT INTO app_productos_multimedia (producto_id,imagen,ficha,descripcion) VALUES (?,0,?,0) ON DUPLICATE KEY UPDATE ficha= ?";
     $stmt1 = conn()->prepare($query1);
     $stmt1->bind_param("iii", $id,$tiene_ficha,$tiene_ficha);
     
-    $query2 ="UPDATE productos SET especificaciones=?, descuento=? WHERE id=?";
+    $query2 ="UPDATE productos SET descuento=? WHERE id=?";
     $stmt2 = conn()->prepare($query2);
-    $stmt2->bind_param("sss`", $descripcion,$descuento,$id);
+    $stmt2->bind_param("ss", $descuento,$id);
     
     $success = false;
     if ($stmt1->execute() && $stmt2->execute()) {

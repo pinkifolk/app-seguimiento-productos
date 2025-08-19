@@ -64,7 +64,7 @@ function show_detail ($search_query, $id){
     return $recepcion_det;
 }
 function receptions ($id, $datos){
-    $query ="UPDATE app_servicios_prod SET estado=1 WHERE id = ?";
+    $query ="UPDATE app_servicios_prod SET estado=1, fecha_recepcion=NOW() WHERE id = ?";
     $stmt = conn()->prepare($query);
     $stmt->bind_param("i",$id);
     $stmt->execute();
@@ -79,12 +79,16 @@ function receptions ($id, $datos){
         $pintura = in_array('pintura', $servicio) ? 1 : 0;
         $reparacion = in_array('reparacion', $servicio) ? 1 : 0;
         $certificacion = in_array('certificacion', $servicio) ? 1 : 0;
+        $ninguno = in_array('ninguno', $servicio) ? 1 : 0;
         
-        $query = "UPDATE app_servicios_prod_det SET limpieza=?, pintura=?, banco_pruebas=? WHERE id=?";
-    
+        if($ninguno === 1){
+            $query = "UPDATE app_servicios_prod_det SET limpieza=?, pintura=?, banco_pruebas=?, ninguno=?, estado=1 WHERE id=?";
+        }else{
+            $query = "UPDATE app_servicios_prod_det SET limpieza=?, pintura=?, banco_pruebas=?, ninguno=? WHERE id=?";
+        }
         $stmt = conn()->prepare($query);
         
-        $stmt->bind_param("iiii",$pintura,$reparacion,$certificacion,$id_registro);
+        $stmt->bind_param("iiiii",$pintura,$reparacion,$certificacion,$ninguno,$id_registro);
         $stmt->execute();
         
         if ($stmt->affected_rows > 0) {

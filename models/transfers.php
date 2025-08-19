@@ -128,5 +128,7 @@ function confirm ($id){
         $update = "UPDATE productos SET outlet=1, consignado=1 WHERE id IN ($in)";
         conn()->query($update);
     }
+    
+    
     return $success;
 }

@@ -8,7 +8,7 @@ function conn (){
 }
 function index($search_query){
     $param = '';
-    $query ="SELECT ASP.*,DATE_FORMAT(ASP.fecha_creacion, '%d-%m-%Y') formato_fecha, DATE_FORMAT(ASP.fecha_termino, '%d-%m-%Y') formato_termino, IFNULL(SUM(ASD.cantidad), 0) AS unidades, ROUND(SUM(CASE WHEN ASD.estado = 1 THEN 1 ELSE 0 END) * 100 / COUNT(ASD.id), 2) avences FROM app_servicios_prod ASP LEFT JOIN app_servicios_prod_det ASD ON ASD.servicios_prod_id = ASP.id";
+    $query ="SELECT ASP.*,DATE_FORMAT(ASP.fecha_creacion, '%d-%m-%Y') formato_fecha, DATE_FORMAT(ASP.fecha_termino, '%d-%m-%Y') formato_termino, DATE_FORMAT(ASP.fecha_recepcion, '%d-%m-%Y') formato_recepcion, IFNULL(SUM(ASD.cantidad), 0) AS unidades, ROUND(SUM(CASE WHEN ASD.estado = 1 THEN 1 ELSE 0 END) * 100 / COUNT(ASD.id), 2) avences FROM app_servicios_prod ASP LEFT JOIN app_servicios_prod_det ASD ON ASD.servicios_prod_id = ASP.id";
     
     if (isset($_GET['search_query']) && !empty($_GET['search_query'])) {
         $search_query = $_GET['search_query'];
