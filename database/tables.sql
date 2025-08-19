@@ -3,6 +3,7 @@ CREATE TABLE app_productos_multimedia (
     producto_id INT(10) UNSIGNED UNIQUE,
     imagen BOOLEAN,
     ficha BOOLEAN,
+	descripcion BOOLEAN,
     FOREIGN KEY (producto_id) REFERENCES productos(id)
 ) ENGINE=MyISAM CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
