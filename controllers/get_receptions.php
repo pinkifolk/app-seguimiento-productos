@@ -46,8 +46,9 @@ if($accion === 5){
             $pintura = in_array('pintura', $servicio) ? 1 : 0;
             $reparacion = in_array('reparacion', $servicio) ? 1 : 0;
             $certificacion = in_array('certificacion', $servicio) ? 1 : 0;
+            $ninguno = in_array('ninguno', $servicio) ? 1 : 0;
             
-            if($pintura === 0 && $reparacion === 0 && $certificacion === 0){
+            if($pintura === 0 && $reparacion === 0 && $certificacion === 0 && $ninguno === 0){
                 return false;
             }
         }

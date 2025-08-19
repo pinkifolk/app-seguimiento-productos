@@ -52,13 +52,36 @@ if($accion === 3){
 }
 
 if($accion === 4){
-    if(empty($producto_id) ||  empty($descripcion) || empty($descuento) || empty($ficha)){
+    if(empty($producto_id) || empty($descuento) || empty($ficha)){
         $response = [
                 "status" => false,
                 "mensaje" => "Uno de los datos es null"
             ];
     }else{
-        $result = documentation($producto_id,$descripcion,$descuento,$ficha);
+        $result = documentation($producto_id,$descuento,$ficha);
+            if($result){
+                $response = [
+                    "status" => true,
+                     "mensaje" => "Registro actualizado correctamente"
+                    ];
+            }else{
+                $response = [
+                    "status" => false,
+                     "mensaje" => "No se pudo modificar el registro"
+                    ];
+            }
+    }
+    
+    
+}
+if($accion === 5){
+    if(empty($producto_id) ||  empty($descripcion)){
+        $response = [
+                "status" => false,
+                "mensaje" => "Uno de los datos es null"
+            ];
+    }else{
+        $result = description($producto_id,$descripcion);
             if($result){
                 $response = [
                     "status" => true,
