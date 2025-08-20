@@ -169,7 +169,7 @@ include '../layout/layout.php';
                             <i class="fa-solid fa-cloud-arrow-up fa-2xl mb-3 mt-3"></i>
                             <p class="mb-1">Carga masiva del detalle</p>
                             <p class="mb-0 text-muted" style="font-size: 10px;font-weight: 500;font-style: italic;">El archivo debe contener ID, CANTIDAD </p>
-                            <p class="mb-0 text-muted" style="font-size: 10px;font-weight: bold;font-style: italic;">Puedes descargar el archivo de ejemple <a href="../recursos/Maestro de cargas masivas.xlsx">aqui</a></p>
+                            <p class="mb-0 text-muted" style="font-size: 10px;font-weight: bold;font-style: italic;">Puedes descargar el archivo de ejemple <a href="../resources/Maestro de cargas masivas.xlsx">aqui</a></p>
                             <input id="fileServices" name="fileServices" type="file" accept=".xlsx, .xls" class="d-none">
                         </label>
                 </div>
