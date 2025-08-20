@@ -2,7 +2,7 @@
 session_start();
 include "conn.php";
 if (!isset($_SESSION['nombre'])) {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
 $date = date('Y-m-d');
