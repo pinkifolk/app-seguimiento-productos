@@ -38,6 +38,8 @@ CREATE TABLE app_servicios_prod_det (
     limpieza BOOLEAN DEFAULT 0,
     pintura BOOLEAN DEFAULT 0,
     banco_pruebas BOOLEAN DEFAULT 0,
+	fecha_inicio DATETIME DEFAULT NULL,
+	fecha_termino DATATIME DEFAULT NULL,	
 	ninguno BOOLEAN DEFAULT 0,
     estado BOOLEAN DEFAULT 0,
     FOREIGN KEY (servicios_prod_id) REFERENCES app_servicios_prod(id)
