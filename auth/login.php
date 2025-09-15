@@ -17,6 +17,8 @@ $usuario_auth =[
     'admin',
     'lfarias',
     'alvaro.reyes',
+    'david.macias',
+    // agregar a James
     ];
 
 
