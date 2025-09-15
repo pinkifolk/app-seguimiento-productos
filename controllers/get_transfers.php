@@ -19,17 +19,39 @@ if($accion ===1){
             "mensaje" => "Uno de los datos es nulo"
         ];
     }else{
+        $ids = [];
+        $duplicados = [];
+    
+        foreach ($datos as $row) {
+            if (!is_array($row) || count($row) < 2) {
+                continue; 
+            }
+            $id = $row[0];
+            if (in_array($id, $ids)) {
+                $duplicados[] = $id;
+            } else {
+                $ids[] = $id;
+            }
+        }
+    if (!empty($duplicados)) {
+        $response = [
+            "status" => false,
+            "mensaje" => "Existen IDs duplicados en el archivo",
+            "duplicados" => $duplicados
+        ];
+    }else{
         $result = create($fecha_llegada,$datos);
-        if($result){
-            $response = [
-                "status" => true,
-                "mensaje" => "Registro actualizado correctamente"
+            if($result){
+                $response = [
+                    "status" => true,
+                    "mensaje" => "Registro actualizado correctamente"
+                    ];
+            }else{
+                $response = [
+                    "status" => false,
+                    "mensaje" => "No se pudo modificar el registro"
                 ];
-        }else{
-            $response = [
-                "status" => false,
-                "mensaje" => "No se pudo modificar el registro"
-            ];
+            }
         }
     }
 }

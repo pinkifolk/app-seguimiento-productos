@@ -96,14 +96,38 @@ if($accion === 6){
 }
 if($accion === 7){
     $input = json_decode(file_get_contents("php://input"), true);
-    $datos = $input['datos'] ?? [];
     $id = desencriptarId($input['id']) ?? 0;
-  
+
+    $result = changeat_status($id);
     
-    $ids = implode(',', array_fill(0, count($datos), '?'));
-    $result = status_detail_receptions($ids,$datos);
-    changeat_status($id);
-    
+    if($result){
+        $response = [
+            "status" => true,
+            "mensaje" => "Registro actualizado correctamente"
+            ];
+    }else{
+        $response = [
+            "status" => false,
+            "mensaje" => "No se pudo modificar el registro"
+        ];
+    }
+}
+if($accion === 8){
+    $result = init_process($id);
+    if($result){
+        $response = [
+            "status" => true,
+            "mensaje" => "Registro actualizado correctamente"
+            ];
+    }else{
+        $response = [
+            "status" => false,
+            "mensaje" => "No se pudo modificar el registro"
+        ];
+    }
+}
+if($accion === 9){
+    $result = end_process($id);
     if($result){
         $response = [
             "status" => true,

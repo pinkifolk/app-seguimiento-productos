@@ -12,9 +12,13 @@ if($accion ===2){
     
     $response = [
         "status" => true,
-        "traslado" => $info["traslado"],
+        
+        "outlet" => $info["outlet"],
+        "fotos" => $info["fotos"],
         "preparacion" => $info["preparacion"],
-        "listos" => $info["listos"]
+        "preparados" => $info["preparados"],
+        "documentacion" =>$info["documentacion"],
+        "venta" =>$info["venta"]
     ];
 }
 
