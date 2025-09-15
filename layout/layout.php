@@ -4,17 +4,27 @@ $page = basename($_SERVER['REQUEST_URI']);
 $id = $_SESSION['id'];
 
 $permisos = [
-    70 => ['traslado','servicios'],
-    81 => ['recepcion'],
-    63 => ['traslado','servicios','recepcion'],
-    40 => ['traslado','servicios','recepcion']
+    70 => ['traslado','servicios',], // luis
+    81 => ['recepcion','servicios'], //alvaro
+    63 => ['traslado','servicios','recepcion'], //yo
+    40 => ['traslado','servicios','recepcion'], // mauro
+    1 => ['traslado','servicios','recepcion'], // eduardo
+    89 => ['productos'], // david
+    90 => ['recepcion'] // james
+    
     
 ];
 $imagenes =[
     63 => 'https://blog.provaltec.cl/intranet/storage/personal/PNpIJ3iGhkjk2CrNvTytZXsTEN5yUSyinh6x4qDD.png',
     81 => 'https://blog.provaltec.cl/intranet/storage/personal/ZWvMt76Du2PyZxSzwTgcU90ZD8oomYA9pKSzgDEI.jpg',
     70 => 'https://blog.provaltec.cl/intranet/storage/personal/gmYfGoU3iqxIVwGDVrOwS8u8Ua0YcuJSZuEufh9v.png',
-    40 => 'https://blog.provaltec.cl/intranet/storage/personal/k8nfHAUG4tgHfaMGdPFFjFJL5cMadlRkTreVP5qN.png'
+    40 => 'https://blog.provaltec.cl/intranet/storage/personal/k8nfHAUG4tgHfaMGdPFFjFJL5cMadlRkTreVP5qN.png',
+    1 => 'https://blog.provaltec.cl/intranet/storage/personal/admin1-1.jpg',
+    88 => 'https://blog.provaltec.cl/intranet/storage/personal/5ONHAsWoWXdfB3bjys043FuZpXL5tRKeIdYrgpBC.png',
+    10 => 'https://blog.provaltec.cl/intranet/storage/personal/uP42eYfzrOwKsWA9emHQ4gRke8bYQA2iYZgF1gWG.jpg',
+    36 =>'https://blog.provaltec.cl/intranet/storage/personal/A7eRjysvpQffDMVBbzxtcQWT3b5hpdYzPPNwpwND.png',
+    89 => 'https://blog.provaltec.cl/intranet/storage/personal/5ONHAsWoWXdfB3bjys043FuZpXL5tRKeIdYrgpBC.png',
+    90 => 'https://blog.provaltec.cl/intranet/storage/personal/fTzEsNd10yvN0KtFQs07cclNSQoMpykcQ9n4zLkw.png'
     ];
 $imagen = $imagenes[$id] ?? [];
 $usuario_permisos = $permisos[$id] ?? [];
@@ -70,7 +80,7 @@ $usuario_permisos = $permisos[$id] ?? [];
                     </li>
                     <?php endif; ?>
             
-                    <?php if (!in_array($id, [81])): ?>
+                    <?php if (!in_array($id, [81,89])): ?>
                     <li class="nav-item">
                         <a class="nav-link <?php echo $page === 'servicios.php' ? 'active' : '' ?>" href="servicios.php">Enviar a Servicios</a>
                     </li>
