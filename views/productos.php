@@ -118,7 +118,17 @@ include '../layout/layout.php';
         .slider.round:before {
           border-radius: 50%; 
         }
+        .pagination .page-item.active .page-link {
+        background-color: #b8b8b8;
+        border-color: #ffffff;
+        color: #ffffff; 
+    }
 </style>
+<!--paginador y revertir la accion del los modades
+
+cargar planilla y el boton de check mantenerlo y el del lado muestra toda la info no editable
+agregar descripcion precio y descuento a una tabla y la equivalencia del producto
+-->
 <div class="container py-4">
     <h1 class="mb-4">Productos</h1>
     <span>Seguimiento de productos</span>
@@ -142,6 +152,10 @@ include '../layout/layout.php';
                 
             </tbody>
         </table>
+        <nav aria-label="paginacion" class="d-flex justify-content-center">
+          <ul class="pagination">
+          </ul>
+        </nav>
     </div>
 </div>
 <!-- Modal imagen -->
@@ -156,7 +170,7 @@ include '../layout/layout.php';
             <h5>¿Tienes la imagen de este producto?</h5>
         </div>
         <div class="modal-footer">
-          <button type="button" data-bs-dismiss="modal" aria-label="Cerrar"class="btn btn-danger">No</button>
+          <button type="button" id="formImagenNo" class="btn btn-danger">No</button>
           <button type="button" id="formImagen" class="btn btn-success">Si</button>
         </div>
     </div>
@@ -174,6 +188,14 @@ dividir la descripcion de la ficha y del descuento
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label><span class="text-danger">*</span>
+              <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="precio" class="form-label">Precio</label><span class="text-danger">*</span>
+              <input type="number" class="form-control" id="precio" name="precio"></textarea>
+            </div>
             <div class="mb-3">
               <label for="descuento" class="form-label">Descuento</label><span class="text-danger">*</span>
                   <select class="form-select" id="descuento" name="descuento" aria-label="Descuento">
@@ -208,29 +230,6 @@ dividir la descripcion de la ficha y del descuento
     </div>
   </div>
 </div>
-<!-- Modal descripcion -->
-<div class="modal fade" id="modalDescription" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <form enctype="multipart/form-data">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalLabel">Detalles</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-            <div class="mb-3">
-              <label for="descripcion" class="form-label">Descripción</label><span class="text-danger">*</span>
-              <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" data-bs-dismiss="modal" aria-label="Cerrar" class="btn btn-danger">Cancelar</button>
-          <button type="button" id="formDescripcion" class="btn btn-success">Confirmar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
@@ -240,6 +239,7 @@ dividir la descripcion de la ficha y del descuento
     const searchInput = document.getElementById('search_input')
     const productsTableBody = document.getElementById('products_table_body')
     const formImagen = document.getElementById('formImagen')
+    const formImagenNo = document.getElementById('formImagenNo')
     const formDoc = document.getElementById('formDoc')
     const formDescripcion = document.getElementById('formDescripcion')
     
@@ -262,9 +262,44 @@ dividir la descripcion de la ficha y del descuento
     "showMethod": "fadeIn", 
     "hideMethod": "fadeOut" 
     }
-    async function productosMultimedia(productoId){
+    function renderPagination(total, currentPage, limit) {
+        const totalPages = Math.ceil(total / limit)
+        const pagination = document.querySelector('.pagination')
+        const search = document.getElementById('search_input').value || ''
+        pagination.innerHTML = ''
+    
+        pagination.innerHTML += `
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link text-black" href="#" data-page="${currentPage - 1}" data-search="${search}">Anterior</a>
+            </li>
+        `
+        for (let i = 1; i <= totalPages; i++) {
+            pagination.innerHTML += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link text-black" href="#" data-page="${i}">${i}</a>
+                </li>
+            `
+        }
+        
+        pagination.innerHTML += `
+            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link text-black" href="#" data-page="${currentPage + 1}" data-search="${search}">Siguiente</a>
+            </li>
+        `
+        pagination.querySelectorAll('a.page-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault()
+                const page = parseInt(e.target.dataset.page)
+                const search = document.getElementById('search_input').value
+                if (!isNaN(page)) {
+                    loadProducts(search, page)
+                }
+            })
+        })
+    }
+    async function productosMultimedia(productoId,estado){
         try{
-            const response = await fetch(`../controllers/get_products.php?accion=3&id=${productoId}`)
+            const response = await fetch(`../controllers/get_products.php?accion=3&id=${productoId}&imagen=${estado}`)
             if(!response.ok){
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
@@ -279,12 +314,12 @@ dividir la descripcion de la ficha y del descuento
         }catch(error){
           console.error('Error al cargar productos:', error)  
         }
-        loadProducts()
+        loadProducts(document.getElementById('search_input').value)
         
     }
-    async function productosFicha(productoId,descuento,ficha){
+    async function productosFicha(productoId,descripcion,precio,descuento,ficha){
         try{
-            const response = await fetch(`../controllers/get_products.php?accion=4&id=${productoId}&descuento=${descuento}&ficha=${ficha}`)
+            const response = await fetch(`../controllers/get_products.php?accion=4&id=${productoId}&descripcion=${descripcion}&precio=${precio}&descuento=${descuento}&ficha=${ficha}`)
             if(!response.ok){
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
@@ -300,38 +335,18 @@ dividir la descripcion de la ficha y del descuento
         }catch(error){
           console.error('Error al cargar productos:', error)  
         }
-        loadProducts()
-        
-    }
-    async function productosDescripcion(productoId,descripcion){
-        try{
-            const response = await fetch(`../controllers/get_products.php?accion=5&id=${productoId}&descripcion=${descripcion}`)
-            if(!response.ok){
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
-            const {status, mensaje} = await response.json()
-            
-            if(!status){
-                toastr.error(mensaje)
-                return
-            }
-           
-            toastr.success(mensaje)
-            
-        }catch(error){
-          console.error('Error al cargar productos:', error)  
-        }
-        loadProducts()
+        loadProducts(document.getElementById('search_input').value)
         
     }
     
-    async function loadProducts(query = '') {
+    async function loadProducts(query = '', page = 1) {
         try {
-            const response = await fetch(`../controllers/get_products.php?accion=2&search_query=${encodeURIComponent(query)}`)
+            const response = await fetch(`../controllers/get_products.php?accion=2&search_query=${encodeURIComponent(query)}&page=${page}`)
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
-            const {products} = await response.json()
+            const data = await response.json()
+            const {products, total, page: currentPage, limit} = data.products
             
             productsTableBody.innerHTML = ''
 
@@ -344,10 +359,18 @@ dividir la descripcion de la ficha y del descuento
                 let readyImageHtml =''
                 let readyDocHtml =''
                 let readyDescriptionHtml = ''
-                console.log(product)
                 if(product.imagen === 1){
                     readyImageHtml =`<div class="ready">
                                     <i class="fa-solid fa-circle-check fa-xl" style="color: rgb(25, 135, 84);"></i>
+                                    <div class="image-overlay" title="${product.especificaciones}">
+                                        <button type="button"
+                                                class="change-image-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalImagen"
+                                                data-id="${product.id_registro}">
+                                            <i class="fas fa-camera fa-lg"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 `
                 }else{
@@ -366,6 +389,20 @@ dividir la descripcion de la ficha y del descuento
                 if(product.ficha === 1){
                      readyDocHtml =`<div class="ready">
                                     <i class="fa-solid fa-circle-check fa-xl" style="color: rgb(25, 135, 84);"></i>
+                                    <div class="image-overlay">
+                                        <button type="button"
+                                                class="change-image-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalDoc"
+                                                data-id="${product.id_registro}"
+                                                data-descuento="${product.descuento ?? "0"}"
+                                                data-descripcion="${product.especificaciones}"
+                                                data-precio="${product.precio ?? ""}"
+                                                data-equivalente="${product.prod_equivalente ?? ""}"
+                                                data-ficha="${product.ficha ?? 0}">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 `
                     
@@ -377,32 +414,17 @@ dividir la descripcion de la ficha y del descuento
                                             data-bs-toggle="modal"
                                             data-bs-target="#modalDoc"
                                             data-id="${product.id_registro}"
-                                            data-descuento="${product.descuento ?? "0"}">
+                                            data-descuento="${product.descuento ?? "0"}"
+                                            data-descripcion="${product.especificaciones}"
+                                            data-precio="${product.precio ?? ""}"
+                                            data-equivalente="${product.prod_equivalente ?? ""}"
+                                            data-ficha="${product.ficha ?? 0}">
                                         <i class="fa-solid fa-circle-info"></i>
                                     </button>
                                 </div>
                                 
                                 `
-                }
-                if(product.descripcion === 1){
-                     readyDescriptionHtml =`<div class="ready">
-                                    <i class="fa-solid fa-circle-check fa-xl" style="color: rgb(25, 135, 84);"></i>
-                                </div>
-                                `
-                }else{
-                    readyDescriptionHtml = `<div class="documents"><i class="fa-regular fa-keyboard fa-xl"></i></div>
-                                <div class="image-overlay">
-                                    <button type="button"
-                                            class="change-image-btn"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalDescription"
-                                            data-id="${product.id_registro}"
-                                            data-descripcion="${product.especificaciones}">
-                                        <i class="fa-solid fa-circle-info"></i>
-                                    </button>
-                                </div>
-                            `
-                }
+                }   
                 const row = `
                     <tr class="align-middle">
                         <td>${product.id}</td>
@@ -420,13 +442,16 @@ dividir la descripcion de la ficha y del descuento
                             </div>
                         </td>
                         <td>${product.cod_unificado}</td>
-                        <td>${product.marca.charAt(0).toUpperCase() + product.marca.slice(1).toLowerCase()}</td>
-                        <td>${product.categoria.charAt(0).toUpperCase() + product.categoria.slice(1).toLowerCase()}</td>
+                        <td>${product.marca}</td>
+                        <td>${product.categoria}</td>
                         <td>${product.stock}</td>
                     </tr>
                 `
                 productsTableBody.insertAdjacentHTML('beforeend', row)
             })
+            
+            renderPagination(total, currentPage, limit)
+            
         } catch (error) {
             console.error('Error al cargar productos:', error)
             productsTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar los productos.</td></tr>'
@@ -460,52 +485,63 @@ dividir la descripcion de la ficha y del descuento
     modalDetalles.addEventListener('show.bs.modal', function(event){
         let boton = event.relatedTarget
         let id = boton.getAttribute('data-id')
-        let descripcion = boton.getAttribute('data-descripcion')
         let descuento = boton.getAttribute('data-descuento')
-        document.querySelector('textarea').value = descripcion
+        let descripcion = boton.getAttribute('data-descripcion')
+        let precio = boton.getAttribute('data-precio')
+        let equivalencia = boton.getAttribute('data-equivalente')
+        let ficha = boton.getAttribute('data-ficha')
         document.querySelector('#descuento').value = parseInt(descuento) === 0 ?'Seleccione el descuento' : descuento
         document.querySelector('#formDoc').setAttribute('data-producto-id', id)
-    })
-    modalDescription.addEventListener('show.bs.modal', function(event){
-        let boton = event.relatedTarget
-        let id = boton.getAttribute('data-id')
-        let descripcion = boton.getAttribute('data-descripcion')
         document.querySelector('textarea').value = descripcion
-        document.querySelector('#formDescripcion').setAttribute('data-producto-id', id)
+        document.querySelector('#precio').value = precio
+        document.querySelector('#ficha').checked = ficha === "1"
+        
+        
+        
+        let tieneFicha = boton.closest('.ready') !== null
+
+        let inputs = modalDetalles.querySelectorAll('input, textarea, select, button#formDoc')
+    
+        if (tieneFicha) {
+            inputs.forEach(el => el.setAttribute('disabled', 'true'))
+        } else {
+            inputs.forEach(el => el.removeAttribute('disabled'))
+        }
     })
     modalImagen.addEventListener('show.bs.modal', function(event){
         let boton = event.relatedTarget
         let id = boton.getAttribute('data-id')
-        document.querySelector('#formImagen').setAttribute('data-producto-id', id)
+        document.querySelectorAll('#formImagen, #formImagenNo').forEach(el => el.setAttribute('data-producto-id', id))
     })
     formImagen.addEventListener('click', function(event){
         let boton = event.target
         let id = boton.getAttribute('data-producto-id')
-        productosMultimedia(id)
+        productosMultimedia(id,1)
+        const bsModal = bootstrap.Modal.getInstance(modalImagen)
+        bsModal.hide()
+    })
+    formImagenNo.addEventListener('click', function(event){
+        let boton = event.target
+        let id = boton.getAttribute('data-producto-id')
+        productosMultimedia(id,0)
         const bsModal = bootstrap.Modal.getInstance(modalImagen)
         bsModal.hide()
     })
     formDoc.addEventListener('click', function(event){
         let boton = event.target
         let id = boton.getAttribute('data-producto-id')
+        let descripcion = document.querySelector('textarea')
+        let precio = document.querySelector('#precio')
         let descuento = document.querySelector('#descuento')
         let ficha = document.querySelector('#ficha')
         
-        productosFicha(id,descuento.value,ficha.checked)
+        productosFicha(id,descripcion.value,precio.value,descuento.value,ficha.checked)
         const bsModal = bootstrap.Modal.getInstance(modalDetalles)
         bsModal.hide()
 
     })
-    formDescripcion.addEventListener('click', function(event){
-        let boton = event.target
-        let id = boton.getAttribute('data-producto-id')
-        let descripcion = document.querySelector('textarea')
-        
-        productosDescripcion(id,descripcion.value)
-        const bsModal = bootstrap.Modal.getInstance(modalDescripcion)
-        bsModal.hide()
-
-    })
+    
+    
 
     
     

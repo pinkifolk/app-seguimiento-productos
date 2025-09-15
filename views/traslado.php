@@ -526,9 +526,13 @@ include '../layout/layout.php';
         const result = await crearTraslado(valorFecha,dataDelExcel)
         
         if(!result.status){
+            if (result.duplicados && result.duplicados.length > 0) {
+                toastr.info("IDs duplicados: " + result.duplicados.join(", "));
+            }
             toastr.error(result.mensaje);
+        }else{
+            toastr.success(result.mensaje);
         }
-        toastr.success(result.mensaje);
         const bsModal = bootstrap.Modal.getInstance(modalTransit)
         bsModal.hide()
         loadProducts()

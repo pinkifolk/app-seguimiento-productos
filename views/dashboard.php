@@ -70,38 +70,22 @@ include '../layout/layout.php';
         border:5px solid #dc3545;
     }
 </style>
+<!--
+nuevos dash 
+fotografia documentacion y servicios en preparacion y servicios listos sku y unidades para servicios solamente.
+
+
+-->
 <div class="container">
-    <!--SERVICIOS POR COLORES-->
-    <!--<div class="container text-center my-4">
-      <div class="row gap-3">
-        <div class="col card border bg-success py-4 text-white">
-            Servicio de Limpieza
-            <span>Operativo</span>
-        </div>
-        
-        <div class="col card border bg-success py-4 text-white">
-            Servicio de Pintura
-            <span>Operativo</span>
-        </div>
-        <div class="col card border bg-success py-4 text-white">
-              Servicio de Fotografia
-              <span>Operativo</span>
-        </div>
-        <div class="col card border bg-danger py-4 text-white">
-              Banco de pruebas
-              <span>No habilitado</span>
-        </div>
-      </div>
-    </div>-->
     <div class="container text-center my-4">
         <div class="indicador">
             <div class="fila">
                 <div class="indicador-estado indicador-listo"></div>
-                <span>Terminado</span>
+                <span>Operativo</span>
             </div>
             <div class="fila">
                 <div class="indicador-estado indicador-no-listo"></div>
-                <span>No Terminado</span>
+                <span>No Operativo</span>
             </div>
         </div>
         <div class="contenedor-estados">
@@ -129,50 +113,55 @@ include '../layout/layout.php';
         -->
         <div class="row gap-4">
         <div class="col border px-5 py-4 card">
-          Total para comercialización
-          <h2>357(sku)</h2>
-          <p>7090(unidades)</p>
+          Total Productos Outlet
+          <h2 id="totalOutlet"></h2>
+          <p id="unidadesOutlet"></p>
         </div>
         <div class="col border px-5 py-4 card">
-          Total listo para comercialización
-         <h2>422 (sku)</h2>
-         <p>2498 (unidades)</p>
+          Listo para comercialización
+         <h2 id="totalVentas"></h2>
+         <p id="unidadesVentas"></p>
         </div>
       </div>
     </div>
-    <!--TOTAL CODIFICADOS-->
-    <!--<div class="container">
-      <div class="row gap-4">
-        <div class="col border px-5 py-4 card">
-          Codificados (Encontrados)
-          <h2>357(sku)</h2>
-          <p>7090(unidades)</p>
-        </div>
-        <div class="col border px-5 py-4 card">
-          No codificados
-         <h2>422 (sku)</h2>
-         <p>2498 (unidades)</p>
-        </div>
-      </div>
-    </div>-->
     
     <!--GRAFICOS -->
     <div class="container">
-        <div class="row gap-1 my-3">
+        <div class="row gap-2 my-3">
             <div class="col">
                 <div class="card">
                   <div class="card-header bg-white">
-                    <h5>Trasladados a Quilicura</h5>
+                    <h5>Fotografia</h5>
                   </div>
                   <div class="card-body">
-                    <canvas id="trasladados"></canvas>
+                    <canvas id="fotos"></canvas>
                   </div>
                 </div>
             </div>
             <div class="col">
                 <div class="card">
                   <div class="card-header bg-white">
-                    <h5>Productos en Preparación</h5>
+                    <h5>Documentación</h5>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="documentacion"></canvas>
+                  </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                  <div class="card-header bg-white">
+                    <h5 >Preparados</h5>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="servicios"></canvas>
+                  </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                  <div class="card-header bg-white">
+                    <h5>En Preparación</h5>
                   </div>
                   <div class="card-body">
                     <canvas id="listos"></canvas>
@@ -182,10 +171,10 @@ include '../layout/layout.php';
             <div class="col">
                 <div class="card">
                   <div class="card-header bg-white">
-                    <h5 >Listo para comercialización</h5>
+                    <h5>Listos para comercialización</h5>
                   </div>
                   <div class="card-body">
-                    <canvas id="servicios"></canvas>
+                    <canvas id="venta"></canvas>
                   </div>
                 </div>
             </div>
@@ -194,44 +183,153 @@ include '../layout/layout.php';
      
 </div>
  <script>
+    const totalOutlet = document.getElementById('totalOutlet')
+    const unidadesOutlet = document.getElementById('unidadesOutlet')
+    const totalVentas = document.getElementById('totalVentas')
+    const unidadesVentas = document.getElementById('unidadesVentas')
+    
     async function loadInfo() {
         try {
             const response = await fetch(`../controllers/get_dashboard.php?accion=2`)
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
-            const {traslado,preparacion,listos} = await response.json()
-            
-            new Chart(document.getElementById('trasladados'), {
-              type: 'pie',
+            const {outlet,fotos,preparacion,preparados,documentacion,venta} = await response.json()
+            new Chart(document.getElementById('fotos'), {
+              type: 'bar',
               data: {
-                labels: ['Quilicura','Lircay'],
+                labels: ['Listos','Pendientes'],
                 datasets: [{
-                  data: traslado,
-                  backgroundColor: ['#0d6efd','#198754']
+                  data: fotos,
+                  backgroundColor: ['#198754','#cb1111']
                 }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: false,
+                    position: 'top'
+                  }
+                },
+                scales: {
+                  y: { beginAtZero: true }
+                }
+              }
+            });
+            new Chart(document.getElementById('documentacion'), {
+              type: 'bar',
+              data: {
+                labels: ['Listos','Pendientes'],
+                datasets: [{
+                  data: documentacion,
+                  backgroundColor: ['#198754','#cb1111']
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: false,
+                    position: 'top'
+                  }
+                },
+                scales: {
+                  y: { beginAtZero: true }
+                }
               }
             });
             new Chart(document.getElementById('listos'), {
-              type: 'pie',
+              type: 'bar',
               data: {
-                labels: ['Limpieza', 'Pintura', 'Fotografia','Banco de prueba'],
+                labels: ['Limpieza','Pintura','Banco Pruebas'],
                 datasets: [{
-                  data: preparacion,
-                  backgroundColor: ['#0d6efd', '#198754', '#ffc107','#cb1111']
+                    label: ['Productos'],
+                    data: [preparacion[0][0],preparacion[0][1],preparacion[0][2]],
+                    backgroundColor: '#198754'
+                },
+                {
+                    label: 'Unidades',
+                    data: [preparacion[1][0],preparacion[1][1],preparacion[1][2]],  
+                    backgroundColor: '#0d6efd'
                 }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: false,
+                    position: 'top'
+                  }
+                },
+                scales: {
+                  y: { beginAtZero: true }
+                }
               }
             });
             new Chart(document.getElementById('servicios'), {
-              type: 'pie',
+              type: 'bar',
               data: {
-                labels: ['Listos para vender', 'En Preparación'],
+                labels: ['Preparados'],
                 datasets: [{
-                  data: listos,
-                  backgroundColor: ['#198754', '#0d6efd']
+                    label: ['Productos'],
+                    data: [preparados[0][0]],
+                    backgroundColor: '#198754'
+                },
+                {
+                    label: 'Unidades',
+                    data: [preparados[0][1]],  
+                    backgroundColor: '#0d6efd'
                 }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: false,
+                    position: 'top'
+                  }
+                },
+                scales: {
+                  y: { beginAtZero: true }
+                }
               }
             });
+            new Chart(document.getElementById('venta'), {
+              type: 'bar',
+              data: {
+                labels: ['Listos para vender'],
+                datasets: [{
+                    label: ['Productos'],
+                    data: [venta[0][0]],
+                    backgroundColor: '#198754'
+                },
+                {
+                    label: 'Unidades',
+                    data: [venta[1][0]],  
+                    backgroundColor: '#0d6efd'
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: false,
+                    position: 'top'
+                  }
+                },
+                scales: {
+                  y: { beginAtZero: true }
+                }
+              }
+            });
+    
+            
+    
+            totalOutlet.textContent = `${outlet[0]} (sku)`
+            unidadesOutlet.textContent = `${Number(outlet[1]).toLocaleString('es-CL')} (unidades)`
+            totalVentas.textContent = `${venta[0]} (sku)`
+            unidadesVentas.textContent = `${Number(venta[1]).toLocaleString('es-CL')} (unidades)`
             
             
         } catch (error) {

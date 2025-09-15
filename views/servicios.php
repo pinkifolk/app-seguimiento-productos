@@ -84,6 +84,8 @@ include '../layout/layout.php';
             background-color: #2196F3;
         }
 </style>
+
+<!--trabajar en un modelo de rendimiendo con fecha de inicio y fin ver evualmente posibles fallos de error a nivel de usuario -->
 <div class="container py-4">
     <h1 class="mb-2">Envio de productos a servicio</h1>
     <div class="d-flex justify-content-end">
@@ -435,6 +437,7 @@ include '../layout/layout.php';
 
         
                 dataDelExcel = XLSX.utils.sheet_to_json(worksheet, { header: 1 })
+                console.log(dataDelExcel)
 
                
                 const htmlTable = XLSX.utils.sheet_to_html(worksheet)
@@ -478,9 +481,14 @@ include '../layout/layout.php';
         const result = await creaEnvioServicios(tituloInset,dataDelExcel)
         
         if(!result.status){
+            if (result.duplicados && result.duplicados.length > 0) {
+                toastr.info("IDs duplicados: " + result.duplicados.join(", "));
+            }
             toastr.error(result.mensaje)
+            
+        }else{
+            toastr.success(result.mensaje)
         }
-        toastr.success(result.mensaje)
         const bsModal = bootstrap.Modal.getInstance(envioServicioModal)
         bsModal.hide()
         loadProducts()
