@@ -9,7 +9,7 @@ function conn (){
 function index($search_query){
     $param = '';
     
-    $query ="SELECT ASP.*, IFNULL(SUM(ASD.cantidad), 0) AS unidades, COUNT(ASD.id) items FROM app_servicios_prod ASP LEFT JOIN app_servicios_prod_det ASD ON ASD.servicios_prod_id = ASP.id";
+    $query ="SELECT ASP.*,DATE_FORMAT(ASP.fecha_creacion, '%d-%m-%Y %H:%i') formato_fecha, DATE_FORMAT(ASP.fecha_termino, '%d-%m-%Y %H:%i') formato_termino, DATE_FORMAT(ASP.fecha_recepcion, '%d-%m-%Y %H:%i') formato_recepcion, IFNULL(SUM(ASD.cantidad), 0) AS unidades, COUNT(ASD.id) items FROM app_servicios_prod ASP LEFT JOIN app_servicios_prod_det ASD ON ASD.servicios_prod_id = ASP.id";
     
     if (isset($_GET['search_query']) && !empty($_GET['search_query'])) {
         $search_query = $_GET['search_query'];
@@ -82,7 +82,7 @@ function receptions ($id, $datos){
         $ninguno = in_array('ninguno', $servicio) ? 1 : 0;
         
         if($ninguno === 1){
-            $query = "UPDATE app_servicios_prod_det SET limpieza=?, pintura=?, banco_pruebas=?, ninguno=?, estado=1 WHERE id=?";
+            $query = "UPDATE app_servicios_prod_det SET limpieza=?, pintura=?, banco_pruebas=?, ninguno=?, fecha_inicio=NOW(), fecha_termino=NOW(), estado=2 WHERE id=?";
         }else{
             $query = "UPDATE app_servicios_prod_det SET limpieza=?, pintura=?, banco_pruebas=?, ninguno=? WHERE id=?";
         }
@@ -104,7 +104,7 @@ function receptions ($id, $datos){
         ];
 }
 function show_detail_receptions($search_query,$id) {
-    $query ="SELECT ASD.id, P.id producto_id, P.cod_unificado, ASD.cantidad, ASD.limpieza, ASD.pintura, ASD.banco_pruebas, ASD.estado FROM app_servicios_prod_det ASD LEFT JOIN app_servicios_prod ASP ON ASP.id=ASD.servicios_prod_id LEFT JOIN productos P ON P.id=ASD.producto_id  WHERE ASP.id=?";
+    $query ="SELECT ASD.id, P.id producto_id, P.cod_unificado, ASD.cantidad, ASD.limpieza, ASD.pintura, ASD.banco_pruebas, ASD.estado,DATE_FORMAT(ASD.fecha_termino, '%d-%m-%Y %H:%i') formato_termino,DATE_FORMAT(ASD.fecha_inicio, '%d-%m-%Y %H:%i') formato_inicio FROM app_servicios_prod_det ASD LEFT JOIN app_servicios_prod ASP ON ASP.id=ASD.servicios_prod_id LEFT JOIN productos P ON P.id=ASD.producto_id  WHERE ASP.id=?";
     
     $params = [$id];
     $types = "s";
@@ -126,13 +126,14 @@ function show_detail_receptions($search_query,$id) {
     
     $recepcion_det = [];
     while ($row = $result->fetch_assoc()) {
+        $row['id'] = encriptarId($row['id']);
         $recepcion_det[] = $row;
     }
     return $recepcion_det;
 }
 function status_detail_receptions($ids,$datos){
     
-    $query ="UPDATE app_servicios_prod_det SET estado=1 WHERE id IN ($ids)";
+    $query ="UPDATE app_servicios_prod_det SET estado=1, fecha_termino=NOW() WHERE id IN ($ids) AND estado = 0";
     $stmt = conn()->prepare($query);
     $types = str_repeat('i', count($datos));
     $params = [];
@@ -149,7 +150,7 @@ function status_detail_receptions($ids,$datos){
     return $success;
 }
 function changeat_status($id) {
-    $query ="SELECT COUNT(*) AS total, SUM(CASE WHEN estado = 1 THEN 1 ELSE 0 END) AS activos FROM app_servicios_prod_det WHERE servicios_prod_id=?";
+    $query ="SELECT COUNT(*) AS total, SUM(CASE WHEN estado = 2 THEN 1 ELSE 0 END) AS activos FROM app_servicios_prod_det WHERE servicios_prod_id=?";
     $stmt = conn()->prepare($query);
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -167,4 +168,22 @@ function changeat_status($id) {
         $stmt->execute();
         $stmt->close();
     }
+}
+function init_process($id){
+    $query ="UPDATE app_servicios_prod_det SET estado=1, fecha_inicio=NOW() WHERE id=?";
+    $stmt = conn()->prepare($query);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $success = $stmt->affected_rows > 0 ? true : false;
+    $stmt->close();
+    return $success;
+}
+function end_process($id){
+    $query ="UPDATE app_servicios_prod_det SET estado=2, fecha_termino=NOW() WHERE id=?";
+    $stmt = conn()->prepare($query);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $success = $stmt->affected_rows > 0 ? true : false;
+    $stmt->close();
+    return $success;
 }
