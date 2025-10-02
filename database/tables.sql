@@ -45,7 +45,8 @@ CREATE TABLE app_servicios_prod_det (
 	fecha_inicio DATETIME DEFAULT NULL,
 	fecha_termino DATATIME DEFAULT NULL,	
 	ninguno BOOLEAN DEFAULT 0,
-	encargado VARCHAR(3)
+	usuario_id INT NOT NULL,
+	encargado VARCHAR(3) NULL,
     estado BOOLEAN DEFAULT 0,
     FOREIGN KEY (servicios_prod_id) REFERENCES app_servicios_prod(id)
 )ENGINE=MyISAM CHARSET=utf8 COLLATE=utf8_spanish_ci;
