@@ -1,25 +1,52 @@
-# Seguimiento
+# APP Seguimiento
 
-Este proyecto es una aplicación desarrollada en PHP para gestionar y dar seguimiento a tareas, proyectos o actividades. Permite organizar información, registrar avances y facilitar la colaboración entre usuarios. Su objetivo principal es mejorar la productividad y el control de procesos dentro de una organización.
+Este proyecto es una aplicación desarrollada en PHP para gestionar y dar seguimiento a tareas, proyectos o actividades. Permite organizar información, registrar avances y facilitar la colaboración entre usuarios. Su objetivo principal es llevar un seguimiento de los productos que necesitan algún tipo de mantención antes de ser comercializados.
 
-Este proyecto es complementario a un sistema por lo que debe tener como base una tabla de productos.
+Este proyecto es complementario a un sistema por lo que debe tener como base un maestro de productos y un maestro de usuarios.
 
-## Características principales
+## Estructura del proyecto
+La estructura se basa en el patron de diseño MVC y usando la convención snake case 
 
-- Registro y gestión de tareas o proyectos
-- Seguimiento de avances y estados
-- Interfaz intuitiva y fácil de usar
-- Posibilidad de colaboración entre varios usuarios
+- root/ 
+  - auth 
+  - controllers
+  - database
+  - layout
+  - middleware
+  - model
+  - resources
+  - views
+  - index
 
-## Requisitos
+## Instalación y configuración
 
+### Requisitos
 - PHP (versión recomendada: 7.4 o superior)
 - Servidor web (Apache, Nginx, etc.)
 - Base de datos MySQL/MariaDB
 
-## Instalación
+### Instalación
+Clona el repositorio en tu ambiente local 
+```sh
+git clone https://github.com/pinkifolk/app-seguimiento-productos.git
+```
+Configura la conexión a la base de datos 
+- root/
+  - database
+    - conn.php  
+```php
+  private $host = "localhost";
+  private $user = "usuarios";
+  private $pass = "clave";
+  private $db = "basededatos";
+```
+Ejecuta la creacion de tablas necesarias desde la consola o como mas te acomode
+```mysql
+  mysql -u [tu_usuario] -p [tu_base] < database/table.sql
+```
+Levanta la aplicación con tu entorno de desarrollo preferido
 
-1. Clona el repositorio en tu servidor local.
-2. Configura la conexión a la base de datos en el archivo de configuración.
-3. Revisa el directorio databases y ejecuta el archivo tablas.sql para crear las tablas.
-4. Accede a la aplicación desde tu navegador.
+
+
+
+
