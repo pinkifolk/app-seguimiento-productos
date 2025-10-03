@@ -7,16 +7,16 @@ Este proyecto es complementario a un sistema por lo que debe tener como base un 
 ## Estructura del proyecto
 La estructura se basa en el patron de diseño MVC y usando la convención snake case 
 
-├── root/ 
-  ├── auth 
-  ├── controllers
-  ├── database
-  ├── layout
-  ├── middleware
-  ├── model
-  ├── resources
-  ├── views
-  ├── index
+-- root/ 
+  -- auth 
+  -- controllers
+  -- database
+  -- layout
+  -- middleware
+  -- model
+  -- resources
+  -- views
+  -- index
 
 ## Instalación y configuración
 
